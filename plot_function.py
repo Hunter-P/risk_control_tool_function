@@ -117,7 +117,7 @@ def plt_score_dist(y_test, y_pred, pos_label=1, figsize=(8,5), bins_cnt=50, save
     plt.clf()
     plt.figure(figsize=figsize)
     start = max(0, min(risk_score)-100)
-    end = min(0, max(risk_score) + 100)
+    end = min(1000, max(risk_score) + 100)
     bins = np.linspace(start, end, num=bins_cnt)
     plt.hist(score_posi['score'], bins, rwidth=0.7, color='r', alpha=.7, label='Class Posi',
              weights=np.ones_like(np.array(score_posi['score']))/float(len(np.array(score_posi['score']))))
