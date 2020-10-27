@@ -83,6 +83,7 @@ class charWoe(object):
             dic['%s,%s' % (k1, k2)] = dict()
             dic['%s,%s' % (k1, k2)]['0'] = dic[k1].get('0', 0) + dic[k2].get('0', 0)
             dic['%s,%s' % (k1, k2)]['1'] = dic[k1].get('1', 0) + dic[k2].get('1', 0)
+            dic['%s,%s' % (k1, k2)]['cnt'] = dic[k1]['cnt'] + dic[k2]['cnt']
             dic['%s,%s' % (k1, k2)]['bad_rate'] = round(dic['%s,%s' % (k1, k2)]['1'] / dic['%s,%s' % (k1, k2)]['cnt'], 5)
             del dic[k1], dic[k2]
         '''
