@@ -115,7 +115,7 @@ class charWoe(object):
             dic['%s,%s' % (k1, k2)]['cnt'] = dic[k1]['cnt'] + dic[k2]['cnt']
             dic['%s,%s' % (k1, k2)]['bad_rate'] = round(dic['%s,%s' % (k1, k2)]['1'] / dic['%s,%s' % (k1, k2)]['cnt'], 5)
             del dic[k1], [k2]
-            min_cnt = min([v['vnt'] for v in dic.values()])
+            min_cnt = min([v['cnt'] for v in dic.values()])
 
         return dic
 
