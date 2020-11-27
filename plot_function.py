@@ -43,7 +43,19 @@ def plot_roc_curve(y_t, y_t_pred, y_v, y_v_pred, y_o, y_o_pred, save_img_path=No
     plt.show()
 
 
-def get_score(prob, od=19, bins=20, base=600):
+def get_score_1(prob):
+    """
+    将概率转化为评分
+    :param prob: 概率
+    :param od:
+    :param bins:
+    :param base:
+    :return:
+    """
+    prob=np.clip(np.array(prob), 0.00000001, 0.9999999)
+    return prob
+
+def get_score_2(prob, od=15, bins=20, base=500):
     """
     将概率转化为评分
     :param prob: 概率
@@ -57,8 +69,56 @@ def get_score(prob, od=19, bins=20, base=600):
     score=base + bins*(np.log(odds) - np.log(od))/np.log(2)
     return score.tolist()
 
+def plot_ks_curve_1(y_label, y_pred, bin=200, save_img_path=None):
+    pred_list=get_score_1(list(y_pred))
+    label_list=list(y_label)
+    total_pos=sum(label_list)
+    total_neg=len(label_list)-total_pos
+    
+    items=sorted(zip(pred_list, label_list), key=lambda x: x[0])
+    step=(max(pred_list) - min(pred_list)) / bin
+    
+    pred_bin, pos_rate, neg_rate, ks_list=[],[],[],[]
+    for i in range(1, bin+1):
+        idx=min(pred_list) + i*step
+        pred_bin.append(idx)
+        label_bin=[x[1] for x in items if x[0]<idx]
+        pos_num=sum(label_bin)
+        neg_num=len(label_bin)-pos_num
+        posrate=pos_num / totoal_pos
+        negrate=neg_num / totoal_neg
+        ks=abs(posrate-negrate)
+        pos_rate.append(posrate)
+        neg_rate.append(negrate)
+        ks_list.append(ks)
+    fig=plt.figure(figsize=(8,5))
+    ax=fig.add_subplots(1,1,1)
+    ax.plot(pred_bin, pos_rate, 'g--', linewidth=2, label='Posi Cumu')
+    ax.plot(pred_bin, neg_rate, 'r--', linewidth=2, label='Neg Cumu')
+    
+    KS=max(ks_list)
+    ks_loc=ks_list.index(max(ks_list))
+    height=max(ks_list)
+    left=pred_bin[ks_loc]
+    bar_width=0.01
+    bottom=pos_rate[ks_loc]
+    plt.title('K-S Curve (KS={:.1f}, probability={:.2f}'.format(KS*100, left), fontsize=13)
+    plt.bar(left, height, bar_width, bottom, alpha=0.5, color='black', label='K-S Value')
+    
+    plt.grid(alpha=.7)
+    plt.legend(loc='best', fancybox=True, shadow=True, fontsize=12)
+    plt.xticks(fontsize=12)
+    plt.yticks(fontsize=12)
+    plt.xlabel('Probability', fontsize=13)
+    plt.ylabel('KS Value', fontsize=13)
+    plt.xlim([-0.05, 1.1])
+    plt.ylim([0.0, 1.1])
+    if save_img_path is not None:
+        plt.savefig(save_img_path, bbos_inches='tight')
+    plt.show()
 
-def plot_ks_curve(y_test, y_prob, pos_label=1, figsize=(8,5), save_img_path=None):
+
+def plot_ks_curve_2(y_test, y_prob, pos_label=1, figsize=(8,5), save_img_path=None):
     """
     绘制ks曲线
     :param y_test: 样本标签
@@ -69,7 +129,7 @@ def plot_ks_curve(y_test, y_prob, pos_label=1, figsize=(8,5), save_img_path=None
     :return: None
     """
     fpr, tpr, thresholds = metrics.roc_curve(y_test, y_prob, pos_label)
-    thresholds = get_score(thresholds)
+    thresholds = get_score_2(thresholds)
     KS = max(list(tpr-fpr))
     ks_loc = list((tpr-fpr).index(KS))
     bar_width = 10
