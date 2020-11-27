@@ -60,7 +60,7 @@ class charWoe(object):
                 dic[k]['iv'] = (b-a)*dic[k]['woe']
 
             dic['IV'] = sum([v['iv'] for v in dic.values()])
-            return dic
+        return dic
 
     def combine_box_char(self, dic):
         """
